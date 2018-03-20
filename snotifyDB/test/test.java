@@ -4,14 +4,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.Scanner;
 
 public class test {	
 	public static void main(String[] cmdLn) throws SQLException, FileNotFoundException {
-		Scanner scan = new Scanner(new FileReader("/home/rustax/Documents/dblogin.txt"));
+		Scanner scan = new Scanner(new FileReader("E:\\Dokument\\dblogin.txt"));
 		String user = scan.nextLine();
 		user = user.substring(user.indexOf(" ")+1);
 		String pw = scan.nextLine();
@@ -23,20 +25,29 @@ public class test {
 		Statement stmt = null;
 		Connection connection = DriverManager.getConnection("jdbc:mariadb://" + ip + "/test?user=" + user + "&password=" + pw);
 		stmt = connection.createStatement();
+		String query;
 		String sql;
-		sql = "SELECT userID, fName, lName FROM Users";
+		sql = "SELECT VasttrafikTripID, distance, totalTIme FROM VasttrafikTrip";
+		query = "INSERT INTO VasttrafikTrip (VasttrafikTripID, distance, totalTime)" + " values (?,?,?)";
+		PreparedStatement prpSt = connection.prepareStatement(query);
+		prpSt.setInt(1, 1337);
+		prpSt.setInt(2, 2435);
+		java.sql.Time time = getCurrentJavaSqlTime();
+		prpSt.setTime(3, time);
+		prpSt.executeQuery();
+		
 		ResultSet rs = stmt.executeQuery(sql);
 		
 		while(rs.next()) {
-			int userID = rs.getInt("userID");
-			String fName = rs.getString("fName");
-			String lName = rs.getString("lName");
+			int VasttrafikTripID = rs.getInt("VasttrafikTripID");
+			int distance = rs.getInt("distance");
+			Time totalTime = rs.getTime("totalTime");
 			//String address = rs.getString("Address");
 			//int phNr = rs.getInt("phoneNr");
 			
-			System.out.println("UserID: " + userID);
-			System.out.println("First Name: " + fName);
-			System.out.println("Last Name: " + lName);
+			System.out.println("VasttrafikTripID: " + VasttrafikTripID);
+			System.out.println("Distance: " + distance);
+			System.out.println("Total Time: " + totalTime);
 			//System.out.println("Address: " + address);
 			//System.out.println("Phone Number: " + phNr);
 			
@@ -45,4 +56,9 @@ public class test {
 		stmt.close();
 		connection.close();
 	}
+	
+	public static java.sql.Time getCurrentJavaSqlTime() {
+	    java.util.Date date = new java.util.Date();
+	    return new java.sql.Time(date.getTime());
+	  }
 }
