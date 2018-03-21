@@ -28,12 +28,11 @@ public class test {
 		String query;
 		String sql;
 		sql = "SELECT VasttrafikTripID, distance, totalTIme FROM VasttrafikTrip";
-		query = "INSERT INTO VasttrafikTrip (VasttrafikTripID, distance, totalTime)" + " values (?,?,?)";
+		query = "INSERT INTO VasttrafikTrip (distance, totalTime)" + " values (?,?)";
 		PreparedStatement prpSt = connection.prepareStatement(query);
-		prpSt.setInt(1, 1337);
-		prpSt.setInt(2, 2435);
+		prpSt.setInt(1, 5001);
 		java.sql.Time time = getCurrentJavaSqlTime();
-		prpSt.setTime(3, time);
+		prpSt.setTime(2, time);
 		prpSt.executeQuery();
 		
 		ResultSet rs = stmt.executeQuery(sql);
