@@ -100,7 +100,7 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	public static void insertToJourney(int JourID, Date date, Time tStart, Time tEnd, String weekDay, int delayed, int dist) throws FileNotFoundException, SQLException {
+	public static void insertToJourney(int JourID, Date date, Time tStart, Time tEnd, String weekDay, int delayed, int dist, int totTime, int nrStops, String startStat) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
 		query = "INSERT INTO Journey (JourneyID, date, timeStart, weekDay, delayed)" + " values(?,?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
@@ -110,8 +110,11 @@ public class insertToDB {
 		prpSt.setTime(4, tEnd);
 		prpSt.setString(5, weekDay);
 		prpSt.setInt(6, delayed);
-		sql = "SELECT VasttrafikTripID FROM TripStops INNER JOIN VasttrafikTrip ON (TripStops.VasttrafikTripID = VasttrafikTrip.VasttrafikTripID) WHERE VasttrafikTrip.distance = " 
-		+ dist + " AND SELECT stopName FROM Stop WHERE ";
+		sql = "SELECT VasttrafikTrip.VasttrafikTripID FROM VasttrafikTrip INNER JOIN TripStops ON "
+				+ "(TripStops.VasttrafikTripID = VasttrafikTrip.VasttrafikTripID) WHERE "
+				+ "VasttrafikTrip.distance = " + dist + " AND VasttrafikTrip.totalTime = " + totTime +
+				" VasttrafikTrip.nrOfStops = " + nrStops + " AND (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = " + "'" + startStat
+				+ "') AND TripStops.number = 1)" ;
 		prpSt.executeQuery();
 		connectDB.connection.close();
 	}
