@@ -23,20 +23,28 @@ public class Main {
 	
 	public static void main(String[] cmdLn) throws SQLException, IOException {
 		
-		String fileName = "E:\\Dokument\\Skola\\Examensarbete\\allstops.csv";
-		InputStream myFileStream = new FileInputStream(fileName);
+//		String fileName = "E:\\Dokument\\Skola\\Examensarbete\\allstops.csv";
+//		InputStream myFileStream = new FileInputStream(fileName);
+//		
+//		ArrayList<String> Stops = new ArrayList<String>();
+//		BufferedReader reader = new BufferedReader(new InputStreamReader(myFileStream,"ISO-8859-1"));
+//		String stop = null;
+//		while ((stop = reader.readLine()) != null) {
+//		    //insertToDB.insertToStop(stop);
+//			Stops.add(stop);
+//		}
+//		
+//		for(String s : Stops) {
+//			System.out.println("Stop: " + s);
+//		}
 		
-		ArrayList<String> Stops = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(myFileStream,"ISO-8859-1"));
-		String stop = null;
-		while ((stop = reader.readLine()) != null) {
-		    //insertToDB.insertToStop(stop);
-			Stops.add(stop);
-		}
+		ArrayList<String> stops = new ArrayList<String>();
+		stops.add("Gamlestaden Station, Göteborg");
+		stops.add("Åmål station, Åmål");
+		stops.add("Hällekis station, Götene");
+		stops.add("Aspedalen station, Lerum");
 		
-		for(String s : Stops) {
-			System.out.println("Stop: " + s);
-		}
+		insertToDB.insertInit(4000, 50, stops);
 		
 		
 		

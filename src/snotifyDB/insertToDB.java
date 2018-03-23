@@ -21,12 +21,12 @@ public class insertToDB {
 	 * and you only need to insert to Vasttrafik table
 	 * and TripStops table
 	 */
-	public static void insertInit(int distance, Time totalTime, ArrayList<String> stopName) throws FileNotFoundException, SQLException {
+	public static void insertInit(int distance, int totalTime, ArrayList<String> stopName) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
 		query = "INSERT INTO VasttrafikTrip (distance, totalTime)" + " values (?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setInt(1, distance);
-		prpSt.setTime(2, totalTime);
+		prpSt.setInt(2, totalTime);
 		prpSt.executeQuery();
 		
 		query = "SELECT LAST_INSERT_ID()";
@@ -53,21 +53,21 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	public static void insertToVasttrafikTrip(int distance, Time totalTime) throws FileNotFoundException, SQLException {
+	public static void insertToVasttrafikTrip(int distance, int totalTime) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
 		query = "INSERT INTO VasttrafikTrip (distance, totalTime)" + " values (?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setInt(1, distance);
-		prpSt.setTime(2, totalTime);
+		prpSt.setInt(2, totalTime);
 		prpSt.executeQuery();
-		query = "SELECT LAST_INSERT_ID()";
+		//query = "SELECT LAST_INSERT_ID()";
 		prpSt = connectDB.connection.prepareStatement(query);
 		//prpSt.executeQuery();
-		ResultSet rs = prpSt.executeQuery();
-		int tripID;
-		while(rs.next()) {
-			tripID = rs.getInt(1);
-		}
+		//ResultSet rs = prpSt.executeQuery();
+		//int tripID;
+		//while(rs.next()) {
+			//tripID = rs.getInt(1);
+		//}
 		
 		connectDB.connection.close();
 	}
@@ -100,7 +100,7 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	public static void insertToJourney(int JourID, Date date, Time tStart, Time tEnd, String weekDay, int delayed) throws FileNotFoundException, SQLException {
+	public static void insertToJourney(int JourID, Date date, Time tStart, Time tEnd, String weekDay, int delayed, int dist) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
 		query = "INSERT INTO Journey (JourneyID, date, timeStart, weekDay, delayed)" + " values(?,?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
@@ -110,6 +110,8 @@ public class insertToDB {
 		prpSt.setTime(4, tEnd);
 		prpSt.setString(5, weekDay);
 		prpSt.setInt(6, delayed);
+		sql = "SELECT VasttrafikTripID FROM TripStops INNER JOIN VasttrafikTrip ON (TripStops.VasttrafikTripID = VasttrafikTrip.VasttrafikTripID) WHERE VasttrafikTrip.distance = " 
+		+ dist + " AND SELECT stopName FROM Stop WHERE ";
 		prpSt.executeQuery();
 		connectDB.connection.close();
 	}
