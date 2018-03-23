@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +22,9 @@ public class Main {
 	private static Statement stmt;
 	private static String sql;
 	
-	public static void main(String[] cmdLn) throws SQLException, IOException {
+	public static void main(String[] cmdLn) throws SQLException, IOException, ParseException {
+		
+		System.out.println(insertToDB.convertToTime("17:23"));
 		
 //		String fileName = "E:\\Dokument\\Skola\\Examensarbete\\allstops.csv";
 //		InputStream myFileStream = new FileInputStream(fileName);
@@ -38,13 +41,13 @@ public class Main {
 //			System.out.println("Stop: " + s);
 //		}
 		
-		ArrayList<String> stops = new ArrayList<String>();
-		stops.add("Gamlestaden Station, Göteborg");
-		stops.add("Åmål station, Åmål");
-		stops.add("Hällekis station, Götene");
-		stops.add("Aspedalen station, Lerum");
-		
-		insertToDB.insertInit(4000, 50, stops);
+//		ArrayList<String> stops = new ArrayList<String>();
+//		stops.add("Gamlestaden Station, Göteborg");
+//		stops.add("Åmål station, Åmål");
+//		stops.add("Hällekis station, Götene");
+//		stops.add("Aspedalen station, Lerum");
+//		
+//		insertToDB.insertInit(4000, 50, stops);
 		
 		
 		

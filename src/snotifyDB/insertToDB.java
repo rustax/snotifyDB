@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class insertToDB {
@@ -90,24 +92,24 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	public static void insertToDelay(Time time, int delay) throws FileNotFoundException, SQLException {
+	public static void insertToDelay(String time, int delay) throws FileNotFoundException, SQLException, ParseException {
 		connectDB.connectToDB();
 		query = "INSERT INTO Delay (JourneyID, stopID, time, delay)" + " values(?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
-		prpSt.setTime(1, time);
+		prpSt.setTime(1, convertToTime(time));
 		prpSt.setInt(2, delay);
 		prpSt.executeQuery();
 		connectDB.connection.close();
 	}
 	
-	public static void insertToJourney(PublicTransportation PT) throws FileNotFoundException, SQLException {
+	public static void insertToJourney(PublicTransportation PT) throws FileNotFoundException, SQLException, ParseException {
 		connectDB.connectToDB();
 		query = "INSERT INTO Journey (VasttrafikTripID, date, timeStart, timeEnd, weekDay, delayed)" + " values(?,?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		//prpSt.setInt(1, JourID);
-		prpSt.setString(2, PT.getDate());
-		prpSt.setString(3, PT.getStartTime());
-		//prpSt.setTime(4, tEnd);
+		prpSt.setDate(2, convertToDate(PT.getDate()));
+		prpSt.setTime(3, convertToTime(PT.getStartTime()));
+		//prpSt.setTime(4, convertToTime(PT.getEndTime()));
 		prpSt.setString(5, PT.getWeekday());
 		//prpSt.setInt(6, PT);
 		sql = "SELECT VasttrafikTrip.VasttrafikTripID FROM VasttrafikTrip INNER JOIN TripStops ON "
@@ -134,7 +136,7 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	private static void insertDelays(int JourID, ArrayList<Stop> Stops) throws SQLException{
+	private static void insertDelays(int JourID, ArrayList<Stop> Stops) throws SQLException, ParseException{
 		query = "INSERT INTO Delay (JourneyID, stopID, time, delay)" + " values(?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setInt(1, JourID);
@@ -145,9 +147,21 @@ public class insertToDB {
 			while(stopID.next()) {
 				prpSt.setInt(2, stopID.getInt(1));
 			}
-			prpSt.setString(3, Stops.get(i).getTime());
+			prpSt.setTime(3, convertToTime(Stops.get(i).getTime()));
 			prpSt.setInt(4, Stops.get(i).getDelay());
 			prpSt.executeQuery();
 		}
+	}
+	
+	public static Time convertToTime(String s) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+		long t = sdf.parse(s).getTime();
+		Time time = new Time(t);
+		return time;
+	}
+	
+	public static Date convertToDate(String s) {
+		java.sql.Date d = java.sql.Date.valueOf(s);
+		return d;
 	}
 }
