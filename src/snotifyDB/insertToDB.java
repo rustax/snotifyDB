@@ -92,7 +92,7 @@ public class insertToDB {
 	
 	public static void insertToDelay(Time time, int delay) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
-		query = "INSERT INTO Delay (time, delay)" + " values(?,?)";
+		query = "INSERT INTO Delay (JourneyID, stopID, time, delay)" + " values(?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setTime(1, time);
 		prpSt.setInt(2, delay);
@@ -100,22 +100,54 @@ public class insertToDB {
 		connectDB.connection.close();
 	}
 	
-	public static void insertToJourney(int JourID, Date date, Time tStart, Time tEnd, String weekDay, int delayed, int dist, int totTime, int nrStops, String startStat) throws FileNotFoundException, SQLException {
+	public static void insertToJourney(PublicTransportation PT) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
-		query = "INSERT INTO Journey (JourneyID, date, timeStart, weekDay, delayed)" + " values(?,?,?,?,?)";
+		query = "INSERT INTO Journey (VasttrafikTripID, date, timeStart, timeEnd, weekDay, delayed)" + " values(?,?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
-		prpSt.setInt(1, JourID);
-		prpSt.setDate(2, date);
-		prpSt.setTime(3, tStart);
-		prpSt.setTime(4, tEnd);
-		prpSt.setString(5, weekDay);
-		prpSt.setInt(6, delayed);
+		//prpSt.setInt(1, JourID);
+		prpSt.setString(2, PT.getDate());
+		prpSt.setString(3, PT.getStartTime());
+		//prpSt.setTime(4, tEnd);
+		prpSt.setString(5, PT.getWeekday());
+		//prpSt.setInt(6, PT);
 		sql = "SELECT VasttrafikTrip.VasttrafikTripID FROM VasttrafikTrip INNER JOIN TripStops ON "
 				+ "(TripStops.VasttrafikTripID = VasttrafikTrip.VasttrafikTripID) WHERE "
-				+ "VasttrafikTrip.distance = " + dist + " AND VasttrafikTrip.totalTime = " + totTime +
-				" VasttrafikTrip.nrOfStops = " + nrStops + " AND (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = " + "'" + startStat
-				+ "') AND TripStops.number = 1)" ;
+				+ "VasttrafikTrip.distance = " + PT.getDistance() + " AND VasttrafikTrip.totalTime = " + PT.getTotalTime() +
+				" AND VasttrafikTrip.nrOfStops = " + PT.getStops().size() + " AND (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = '" + PT.getStartStopName()
+				+ "') AND TripStops.number = 1) OR (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = '" + PT.getEndStopName() + "')"
+				+ " AND TripStops.number = " + PT.getStops().size() + ") HAVING COUNT(TripStops.stopID) = 2;";
+		prpSt2 = connectDB.connection.prepareStatement(sql);
+		ResultSet tripID = prpSt2.executeQuery();
+		while(tripID.next()) {
+			prpSt.setInt(1, tripID.getInt(1));
+		}
 		prpSt.executeQuery();
+		//Om något fuckas är det detta
+		query = "SELECT LAST_INSERT_ID()";
+		prpSt = connectDB.connection.prepareStatement(query);
+		ResultSet rs = prpSt.executeQuery();
+		int JourID = 0;
+		while(rs.next()) {
+			JourID = rs.getInt(1);
+		}
+		insertDelays(JourID, PT.getStops());
 		connectDB.connection.close();
+	}
+	
+	private static void insertDelays(int JourID, ArrayList<Stop> Stops) throws SQLException{
+		query = "INSERT INTO Delay (JourneyID, stopID, time, delay)" + " values(?,?,?,?)";
+		prpSt = connectDB.connection.prepareStatement(query);
+		prpSt.setInt(1, JourID);
+		for(int i = 0; i < Stops.size(); i++) {
+			sql = "SELECT stopID FROM Stop WHERE stopName = " + Stops.get(i).getStopName();
+			prpSt2 = connectDB.connection.prepareStatement(sql);
+			ResultSet stopID = prpSt2.executeQuery();
+			while(stopID.next()) {
+				prpSt.setInt(2, stopID.getInt(1));
+			}
+			prpSt.setString(3, Stops.get(i).getTime());
+			prpSt.setInt(4, Stops.get(i).getDelay());
+			prpSt.executeQuery();
+		}
 	}
 }
