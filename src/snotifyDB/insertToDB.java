@@ -23,12 +23,13 @@ public class insertToDB {
 	 * and you only need to insert to Vasttrafik table
 	 * and TripStops table
 	 */
-	public static void insertInit(int distance, int totalTime, ArrayList<String> stopName) throws FileNotFoundException, SQLException {
+	public static void insertInit(int distance, int totalTime, int nrStops, ArrayList<String> stopName) throws FileNotFoundException, SQLException {
 		connectDB.connectToDB();
-		query = "INSERT INTO VasttrafikTrip (distance, totalTime)" + " values (?,?)";
+		query = "INSERT INTO VasttrafikTrip (distance, totalTime, nrOfStops)" + " values (?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setInt(1, distance);
 		prpSt.setInt(2, totalTime);
+		prpSt.setInt(3, nrStops);
 		prpSt.executeQuery();
 		
 		query = "SELECT LAST_INSERT_ID()";
